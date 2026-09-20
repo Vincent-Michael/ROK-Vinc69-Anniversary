@@ -1,6 +1,10 @@
-# ROK Anniversary Shop Calculator
+# ROK-Vinc69-Anniversary
 
-Interactive Rise of Kingdoms Anniversary Shop calculator.
+Interactive Rise of Kingdoms Anniversary Shop Calculator 2026.
+
+## Live Website
+
+https://vincent-michael.github.io/ROK-Vinc69-Anniversary/
 
 ## Features
 
