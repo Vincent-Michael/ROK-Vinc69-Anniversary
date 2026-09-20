@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rise of Kingdoms - Anniversary Shop Calculator</title>
+<style>
+  :root{
+    --bg:#100b09;
+    --panel:#1d1410;
+    --panel2:#2a1a13;
+    --gold:#f4c44d;
+    --gold2:#ffdf7d;
+    --text:#fff5df;
+    --muted:#c7b79f;
+    --green:#61d7a8;
+    --purple:#d681ff;
+    --shadow:0 16px 50px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(246,174,58,.16), transparent 28%),
+      linear-gradient(180deg,#120a07 0%,#090706 100%);
+    color:var(--text);
+    min-height:100vh;
+  }
+  .wrap{max-width:1400px;margin:auto;padding:28px}
+  h1{margin:0 0 6px;font-size:clamp(28px,4vw,48px);color:var(--gold2)}
+  .subtitle{color:var(--muted);margin-bottom:22px}
+  .summary{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .card{
+    background:linear-gradient(180deg,rgba(46,29,20,.96),rgba(29,20,16,.96));
+    border:1px solid rgba(244,196,77,.25);
+    border-radius:16px;
+    padding:18px;
+    box-shadow:var(--shadow);
+  }
+  .label{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  .value{font-size:28px;font-weight:800;margin-top:6px}
+  .green{color:var(--green)}
+  .purple{color:var(--purple)}
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    margin:18px 0;
+  }
+  input[type="search"], select{
+    background:#160f0c;
+    color:var(--text);
+    border:1px solid #5f4028;
+    border-radius:10px;
+    padding:11px 12px;
+    outline:none;
+  }
+  input[type="search"]{min-width:260px;flex:1}
+  button{
+    border:1px solid #8d6136;
+    background:linear-gradient(180deg,#5e3c20,#392414);
+    color:#fff5df;
+    border-radius:10px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  button:hover{filter:brightness(1.12)}
+  .danger{border-color:#7d413b;color:#ffd2ce}
+  .tablewrap{
+    overflow:auto;
+    background:rgba(20,14,11,.92);
+    border:1px solid rgba(244,196,77,.22);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+  }
+  table{width:100%;border-collapse:collapse;min-width:1050px}
+  th,td{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,.07);vertical-align:middle}
+  th{
+    position:sticky;
+    top:0;
+    z-index:2;
+    background:#25160f;
+    color:var(--gold2);
+    text-align:left;
+    font-size:12px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+  }
+  tr:hover td{background:rgba(255,255,255,.025)}
+  .num{text-align:right;white-space:nowrap}
+  .qty{
+    width:80px;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #66452c;
+    background:#100b09;
+    color:white;
+  }
+  .badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#392518;
+    color:#e8cfad;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .costline{white-space:nowrap}
+  .sourcebox{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  .sourcebox ul{margin:10px 0 0;padding-left:20px;color:#e7d8c3}
+  .small{font-size:12px;color:var(--muted)}
+  .selected{accent-color:#d4a940;width:18px;height:18px}
+  .footer{margin:18px 0 4px;color:#9f8f7b;font-size:12px}
+  @media(max-width:800px){
+    .wrap{padding:14px}
+    .summary{grid-template-columns:1fr 1fr}
+    .sourcebox{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎉 Anniversary Shop Calculator</h1>
+  <div class="subtitle">Select items and quantities to calculate the exact Artist Token and Collector Token cost.</div>
+
+  <section class="summary">
+    <div class="card">
+      <div class="label">Selected Quantity</div>
+      <div class="value" id="selectedQty">0</div>
+    </div>
+    <div class="card">
+      <div class="label">Selected Offers</div>
+      <div class="value" id="selectedOffers">0 / 34</div>
+    </div>
+    <div class="card">
+      <div class="label">🟢 Artist Tokens</div>
+      <div class="value green" id="greenTotal">0</div>
+    </div>
+    <div class="card">
+      <div class="label">🟣 Collector Tokens</div>
+      <div class="value purple" id="purpleTotal">0</div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search items..." />
+    <select id="category">
+      <option value="all">All categories</option>
+    </select>
+    <button id="allBtn">Select All</button>
+    <button id="noneBtn">Clear All</button>
+    <button id="maxBtn">Set Selected to Max</button>
+    <button id="resetBtn" class="danger">Reset</button>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Use</th>
+          <th>Category</th>
+          <th>Item</th>
+          <th class="num">Max</th>
+          <th class="num">Qty</th>
+          <th class="num">Artist / Each</th>
+          <th class="num">Collector / Each</th>
+          <th class="num">Artist Total</th>
+          <th class="num">Collector Total</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <section class="sourcebox">
+    <div class="card">
+      <div class="label">🟢 Artist Token Sources</div>
+      <ul>
+        <li>Art Carnival</li>
+        <li>Alliance Quiz</li>
+        <li>Arms Training</li>
+        <li>Riddles of the Sphinx</li>
+        <li>Barbarian Incursions</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="label">🟣 Collector Token Sources</div>
+      <ul>
+        <li>Desert Tracks</li>
+        <li>Art Carnival</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="footer">
+    Full shop maximum: 🟢 <strong>4,750 Artist Tokens</strong> + 🟣 <strong>3,175 Collector Tokens</strong><br>
+    © 2026 · Made by <strong>Vinc69cmAløT#1689</strong>
+  </div>
+</div>
+
+<script>
+const items = [
+  ["🏰 Special / Permanent","Coronal Court (Permanent)",1,100,100],
+  ["🏰 Special / Permanent","Helios Bronze Colossus",1,150,0],
+
+  ["🗿 Commander Sculptures","Legendary Commander Sculpture",5,80,0],
+  ["🗿 Commander Sculptures","Legendary Commander Sculpture",5,30,15],
+  ["🗿 Commander Sculptures","Legendary Commander Sculpture",10,0,50],
+
+  ["⚒️ Equipment","Equipment Materials Chest",5,30,0],
+  ["⚒️ Equipment","Equipment Material Choice Chest",5,0,70],
+  ["⚒️ Equipment","Conquest Blueprint Fragment Choice Chest",5,80,0],
+  ["⚒️ Equipment","Iconic Crystal",1,80,50],
+
+  ["🛡️ Formation","Formation Choice Chest",10,60,0],
+  ["🛡️ Formation","Formation Choice Chest",20,0,30],
+  ["🛡️ Formation","Transmutation Stone",5,35,0],
+  ["🛡️ Formation","Transmutation Stone",15,10,10],
+  ["🛡️ Formation","Transmutation Crystal",1,150,50],
+
+  ["✨ Starlight Sculptures","Dazzling Starlight Sculpture",15,20,0],
+  ["✨ Starlight Sculptures","Blessed Dazzling Starlight Sculpture",5,0,15],
+  ["✨ Starlight Sculptures","Bundle of Dazzling Starlight Sculptures",5,0,15],
+
+  ["🔑 Keys","Crystal Key",10,20,0],
+  ["🔑 Keys","Sovereign Key",10,20,0],
+  ["🔑 Keys","Sovereign Key",20,5,10],
+
+  ["📚 Other Items","Lvl 7 Tome of Knowledge",20,0,2],
+  ["📚 Other Items","Level 6 Reserves",2,0,50],
+  ["📚 Other Items","Exhibit Coins",500,1,0],
+  ["📚 Other Items","Relic Coins",100,0,2],
+  ["📚 Other Items","Skill Reset",1,100,0],
+  ["📚 Other Items","Skill Reset",1,25,20],
+  ["📚 Other Items","Talent Reset",1,20,0],
+
+  ["📦 Resource Chests",'Level 5 "Pick One" Resource Chest',50,0,3],
+  ["📦 Resource Chests",'Level 4 "Pick One" Resource Chest',50,3,0],
+
+  ["👥 Army Expansion","Advanced Army Expansion",2,0,20],
+  ["👥 Army Expansion","Basic Army Expansion",2,25,0],
+
+  ["⏱️ Speedups","60-Minute Healing Speedup",30,10,0],
+  ["⏱️ Speedups","60-Minute Training Speedup",30,10,0],
+  ["⏱️ Speedups","3-Hour Speedup",50,0,8],
+].map((x,i)=>({
+  id:i,
+  category:x[0],
+  name:x[1],
+  max:x[2],
+  green:x[3],
+  purple:x[4],
+  qty:0,
+  selected:false
+}));
+
+const tbody = document.getElementById("rows");
+const search = document.getElementById("search");
+const category = document.getElementById("category");
+
+[...new Set(items.map(i=>i.category))].forEach(c=>{
+  const o=document.createElement("option");
+  o.value=c;
+  o.textContent=c;
+  category.appendChild(o);
+});
+
+function fmt(n){return n.toLocaleString("en-US")}
+
+function render(){
+  const q = search.value.trim().toLowerCase();
+  const cat = category.value;
+  tbody.innerHTML="";
+
+  items.forEach(i=>{
+    if(q && !i.name.toLowerCase().includes(q) && !i.category.toLowerCase().includes(q)) return;
+    if(cat!=="all" && i.category!==cat) return;
+
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td><input class="selected" type="checkbox" data-id="${i.id}" ${i.selected?"checked":""}></td>
+      <td><span class="badge">${i.category}</span></td>
+      <td><strong>${i.name}</strong></td>
+      <td class="num">${fmt(i.max)}</td>
+      <td class="num"><input class="qty" type="number" min="0" max="${i.max}" value="${i.qty}" data-qty="${i.id}"></td>
+      <td class="num costline">${i.green?`🟢 ${fmt(i.green)}`:"—"}</td>
+      <td class="num costline">${i.purple?`🟣 ${fmt(i.purple)}`:"—"}</td>
+      <td class="num green">${i.selected?fmt(i.qty*i.green):"0"}</td>
+      <td class="num purple">${i.selected?fmt(i.qty*i.purple):"0"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll("[data-id]").forEach(el=>el.onchange=e=>{
+    const i=items[+e.target.dataset.id];
+    i.selected=e.target.checked;
+    if(i.selected && i.qty===0) i.qty=i.max;
+    render();
+  });
+
+  document.querySelectorAll("[data-qty]").forEach(el=>el.oninput=e=>{
+    const i=items[+e.target.dataset.qty];
+    let v=Math.max(0,Math.min(i.max,parseInt(e.target.value||0)));
+    i.qty=v;
+    i.selected=v>0;
+    render();
+  });
+
+  totals();
+}
+
+function totals(){
+  let g=0,p=0,qty=0,offers=0;
+  items.forEach(i=>{
+    if(i.selected){
+      offers++;
+      qty+=i.qty;
+      g+=i.qty*i.green;
+      p+=i.qty*i.purple;
+    }
+  });
+  document.getElementById("greenTotal").textContent=fmt(g);
+  document.getElementById("purpleTotal").textContent=fmt(p);
+  document.getElementById("selectedQty").textContent=fmt(qty);
+  document.getElementById("selectedOffers").textContent=`${offers} / ${items.length}`;
+}
+
+search.oninput=render;
+category.onchange=render;
+
+document.getElementById("allBtn").onclick=()=>{
+  items.forEach(i=>{i.selected=true;i.qty=i.max});
+  render();
+};
+
+document.getElementById("noneBtn").onclick=()=>{
+  items.forEach(i=>{i.selected=false;i.qty=0});
+  render();
+};
+
+document.getElementById("maxBtn").onclick=()=>{
+  items.forEach(i=>{if(i.selected)i.qty=i.max});
+  render();
+};
+
+document.getElementById("resetBtn").onclick=()=>{
+  items.forEach(i=>{i.selected=false;i.qty=0});
+  search.value="";
+  category.value="all";
+  render();
+};
+
+render();
+</script>
+</body>
+</html>
