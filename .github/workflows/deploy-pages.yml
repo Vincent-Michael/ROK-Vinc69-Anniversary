@@ -1,4 +1,4 @@
-name: Deploy Anniversary Shop Calculator to GitHub Pages
+name: Deploy ROK-Vinc69-Anniversary
 
 on:
   push:
