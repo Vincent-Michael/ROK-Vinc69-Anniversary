@@ -15,12 +15,10 @@ Interactive Rise of Kingdoms Anniversary Shop calculator.
 
 ## GitHub Pages
 
-This repository includes a GitHub Actions workflow at:
+Deployment is enabled through GitHub Actions.
+
+Workflow:
 
 `.github/workflows/deploy-pages.yml`
 
-To publish the page, set:
-
-**Settings → Pages → Build and deployment → Source → GitHub Actions**
-
-Then push to `main` or run the workflow manually from the **Actions** tab.
+Every push to `main` automatically publishes the latest version to GitHub Pages.
