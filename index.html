@@ -124,6 +124,27 @@
   .small{font-size:12px;color:var(--muted)}
   .selected{accent-color:#d4a940;width:18px;height:18px}
   .footer{margin:18px 0 4px;color:#9f8f7b;font-size:12px}
+  .shop-maximum{
+    margin-top:22px;
+    padding:20px 24px;
+    border:1px solid rgba(244,196,77,.35);
+    border-radius:16px;
+    background:linear-gradient(180deg,rgba(68,42,23,.98),rgba(35,23,16,.98));
+    box-shadow:var(--shadow);
+    text-align:center;
+  }
+  .shop-maximum-title{
+    color:var(--gold2);
+    font-size:clamp(22px,3vw,32px);
+    font-weight:900;
+    letter-spacing:.02em;
+    margin-bottom:10px;
+  }
+  .shop-maximum-values{
+    font-size:clamp(20px,2.5vw,28px);
+    font-weight:800;
+    line-height:1.5;
+  }
   @media(max-width:800px){
     .wrap{padding:14px}
     .summary{grid-template-columns:1fr 1fr}
@@ -205,8 +226,16 @@
     </div>
   </section>
 
+  <div class="shop-maximum">
+    <div class="shop-maximum-title">💰 Full Shop Maximum</div>
+    <div class="shop-maximum-values">
+      🟢 <span class="green">4,750 Artist Tokens</span>
+      &nbsp; + &nbsp;
+      🟣 <span class="purple">3,175 Collector Tokens</span>
+    </div>
+  </div>
+
   <div class="footer">
-    Full shop maximum: 🟢 <strong>4,750 Artist Tokens</strong> + 🟣 <strong>3,175 Collector Tokens</strong><br>
     © 2026 · Made by <strong>Vinc69cmAløT#1689</strong>
   </div>
 </div>
